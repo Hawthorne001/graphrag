@@ -18,6 +18,8 @@ from tenacity import (
     wait_exponential_jitter,
 )
 
+import graphrag.config.defaults as defs
+from graphrag.logger.base import StatusLogger
 from graphrag.query.llm.base import BaseTextEmbedding
 from graphrag.query.llm.oai.base import OpenAILLMImpl
 from graphrag.query.llm.oai.typing import (
@@ -25,7 +27,6 @@ from graphrag.query.llm.oai.typing import (
     OpenaiApiType,
 )
 from graphrag.query.llm.text_utils import chunk_text
-from graphrag.query.progress import StatusReporter
 
 
 class OpenAIEmbedding(BaseTextEmbedding, OpenAILLMImpl):
@@ -41,12 +42,12 @@ class OpenAIEmbedding(BaseTextEmbedding, OpenAILLMImpl):
         api_version: str | None = None,
         api_type: OpenaiApiType = OpenaiApiType.OpenAI,
         organization: str | None = None,
-        encoding_name: str = "cl100k_base",
+        encoding_name: str = defs.ENCODING_MODEL,
         max_tokens: int = 8191,
         max_retries: int = 10,
         request_timeout: float = 180.0,
         retry_error_types: tuple[type[BaseException]] = OPENAI_RETRY_ERROR_TYPES,  # type: ignore
-        reporter: StatusReporter | None = None,
+        logger: StatusLogger | None = None,
     ):
         OpenAILLMImpl.__init__(
             self=self,
@@ -59,7 +60,7 @@ class OpenAIEmbedding(BaseTextEmbedding, OpenAILLMImpl):
             organization=organization,
             max_retries=max_retries,
             request_timeout=request_timeout,
-            reporter=reporter,
+            logger=logger,
         )
 
         self.model = model

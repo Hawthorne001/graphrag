@@ -2,11 +2,11 @@
 # Licensed under the MIT License
 import unittest
 
-import networkx as nx
-
-from graphrag.index.verbs.entities.extraction.strategies.graph_intelligence.run_graph_intelligence import (
-    Document,
+from graphrag.index.operations.extract_entities.graph_intelligence_strategy import (
     run_extract_entities,
+)
+from graphrag.index.operations.extract_entities.typing import (
+    Document,
 )
 from tests.unit.indexing.verbs.helpers.mock_llm import create_mock_llm
 
@@ -16,9 +16,8 @@ class TestRunChain(unittest.IsolatedAsyncioTestCase):
         results = await run_extract_entities(
             docs=[Document("test_text", "1")],
             entity_types=["person"],
-            reporter=None,
+            callbacks=None,
             args={
-                "prechunked": True,
                 "max_gleanings": 0,
                 "summarize_descriptions": False,
             },
@@ -42,7 +41,7 @@ class TestRunChain(unittest.IsolatedAsyncioTestCase):
         # self.assertItemsEqual isn't available yet, or I am just silly
         # so we sort the lists and compare them
         assert sorted(["TEST_ENTITY_1", "TEST_ENTITY_2", "TEST_ENTITY_3"]) == sorted([
-            entity["name"] for entity in results.entities
+            entity["title"] for entity in results.entities
         ])
 
     async def test_run_extract_entities_multiple_documents_correct_entities_returned(
@@ -51,9 +50,8 @@ class TestRunChain(unittest.IsolatedAsyncioTestCase):
         results = await run_extract_entities(
             docs=[Document("text_1", "1"), Document("text_2", "2")],
             entity_types=["person"],
-            reporter=None,
+            callbacks=None,
             args={
-                "prechunked": True,
                 "max_gleanings": 0,
                 "summarize_descriptions": False,
             },
@@ -81,16 +79,15 @@ class TestRunChain(unittest.IsolatedAsyncioTestCase):
         # self.assertItemsEqual isn't available yet, or I am just silly
         # so we sort the lists and compare them
         assert sorted(["TEST_ENTITY_1", "TEST_ENTITY_2", "TEST_ENTITY_3"]) == sorted([
-            entity["name"] for entity in results.entities
+            entity["title"] for entity in results.entities
         ])
 
     async def test_run_extract_entities_multiple_documents_correct_edges_returned(self):
         results = await run_extract_entities(
             docs=[Document("text_1", "1"), Document("text_2", "2")],
             entity_types=["person"],
-            reporter=None,
+            callbacks=None,
             args={
-                "prechunked": True,
                 "max_gleanings": 0,
                 "summarize_descriptions": False,
             },
@@ -117,8 +114,8 @@ class TestRunChain(unittest.IsolatedAsyncioTestCase):
 
         # self.assertItemsEqual isn't available yet, or I am just silly
         # so we sort the lists and compare them
-        assert results.graphml_graph is not None, "No graphml graph returned!"
-        graph = nx.parse_graphml(results.graphml_graph)  # type: ignore
+        graph = results.graph
+        assert graph is not None, "No graph returned!"
 
         # convert to strings for more visual comparison
         edges_str = sorted([f"{edge[0]} -> {edge[1]}" for edge in graph.edges])
@@ -133,9 +130,8 @@ class TestRunChain(unittest.IsolatedAsyncioTestCase):
         results = await run_extract_entities(
             docs=[Document("text_1", "1"), Document("text_2", "2")],
             entity_types=["person"],
-            reporter=None,
+            callbacks=None,
             args={
-                "prechunked": True,
                 "max_gleanings": 0,
                 "summarize_descriptions": False,
             },
@@ -160,8 +156,8 @@ class TestRunChain(unittest.IsolatedAsyncioTestCase):
             ),
         )
 
-        assert results.graphml_graph is not None, "No graphml graph returned!"
-        graph = nx.parse_graphml(results.graphml_graph)  # type: ignore
+        graph = results.graph  # type: ignore
+        assert graph is not None, "No graph returned!"
 
         # TODO: The edges might come back in any order, but we're assuming they're coming
         # back in the order that we passed in the docs, that might not be true
@@ -171,9 +167,11 @@ class TestRunChain(unittest.IsolatedAsyncioTestCase):
         assert (
             graph.nodes["TEST_ENTITY_2"].get("source_id") == "1"
         )  # TEST_ENTITY_2 should be in just 1
-        assert sorted(
-            graph.nodes["TEST_ENTITY_1"].get("source_id").split(",")
-        ) == sorted(["1", "2"])  # TEST_ENTITY_1 should be 1 and 2
+        ids_str = graph.nodes["TEST_ENTITY_1"].get("source_id") or ""
+        assert sorted(ids_str.split(",")) == sorted([
+            "1",
+            "2",
+        ])  # TEST_ENTITY_1 should be 1 and 2
 
     async def test_run_extract_entities_multiple_documents_correct_edge_source_ids_mapped(
         self,
@@ -181,9 +179,8 @@ class TestRunChain(unittest.IsolatedAsyncioTestCase):
         results = await run_extract_entities(
             docs=[Document("text_1", "1"), Document("text_2", "2")],
             entity_types=["person"],
-            reporter=None,
+            callbacks=None,
             args={
-                "prechunked": True,
                 "max_gleanings": 0,
                 "summarize_descriptions": False,
             },
@@ -208,8 +205,8 @@ class TestRunChain(unittest.IsolatedAsyncioTestCase):
             ),
         )
 
-        assert results.graphml_graph is not None, "No graphml graph returned!"
-        graph = nx.parse_graphml(results.graphml_graph)  # type: ignore
+        graph = results.graph  # type: ignore
+        assert graph is not None, "No graph returned!"
         edges = list(graph.edges(data=True))
 
         # should only have 2 edges

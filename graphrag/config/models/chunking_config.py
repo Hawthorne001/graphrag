@@ -6,6 +6,7 @@
 from pydantic import BaseModel, Field
 
 import graphrag.config.defaults as defs
+from graphrag.config.enums import ChunkStrategyType
 
 
 class ChunkingConfig(BaseModel):
@@ -19,18 +20,9 @@ class ChunkingConfig(BaseModel):
         description="The chunk by columns to use.",
         default=defs.CHUNK_GROUP_BY_COLUMNS,
     )
-    strategy: dict | None = Field(
-        description="The chunk strategy to use, overriding the default tokenization strategy",
-        default=None,
+    strategy: ChunkStrategyType = Field(
+        description="The chunking strategy to use.", default=defs.CHUNK_STRATEGY
     )
-
-    def resolved_strategy(self) -> dict:
-        """Get the resolved chunking strategy."""
-        from graphrag.index.verbs.text.chunk import ChunkStrategyType
-
-        return self.strategy or {
-            "type": ChunkStrategyType.tokens,
-            "chunk_size": self.size,
-            "chunk_overlap": self.overlap,
-            "group_by_columns": self.group_by_columns,
-        }
+    encoding_model: str = Field(
+        description="The encoding model to use.", default=defs.ENCODING_MODEL
+    )

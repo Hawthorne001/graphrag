@@ -4,10 +4,8 @@ import asyncio
 import os
 import unittest
 
-from graphrag.index.cache import (
-    JsonPipelineCache,
-)
-from graphrag.index.storage.file_pipeline_storage import (
+from graphrag.cache.json_pipeline_cache import JsonPipelineCache
+from graphrag.storage.file_pipeline_storage import (
     FilePipelineStorage,
 )
 
@@ -15,7 +13,7 @@ TEMP_DIR = "./.tmp"
 
 
 def create_cache():
-    storage = FilePipelineStorage(os.path.join(os.getcwd(), ".tmp"))
+    storage = FilePipelineStorage(root_dir=os.path.join(os.getcwd(), ".tmp"))
     return JsonPipelineCache(storage)
 
 

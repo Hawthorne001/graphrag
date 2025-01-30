@@ -77,6 +77,9 @@ def to_optional_list(
         if isinstance(value, np.ndarray):
             value = value.tolist()
 
+        if isinstance(value, str):
+            value = [value]
+
         if not isinstance(value, list):
             msg = f"value is not a list: {value} ({type(value)})"
             raise ValueError(msg)
@@ -162,8 +165,7 @@ def to_optional_float(data: pd.Series, column_name: str | None) -> float | None:
         if value is None:
             return None
         if not isinstance(value, float):
-            msg = f"value is not a float: {value} ({type(value)})"
-            raise ValueError(msg)
+            return float(value)
     else:
         msg = f"Column {column_name} not found in data"
         raise ValueError(msg)

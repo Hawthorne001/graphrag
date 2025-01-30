@@ -10,10 +10,10 @@ from typing import Any
 
 import pandas as pd
 
-from graphrag.index.config import PipelineInputConfig
-from graphrag.index.progress import ProgressReporter
-from graphrag.index.storage import PipelineStorage
-from graphrag.index.utils import gen_md5_hash
+from graphrag.config.models.input_config import InputConfig
+from graphrag.index.utils.hashing import gen_sha512_hash
+from graphrag.logger.base import ProgressLogger
+from graphrag.storage.pipeline_storage import PipelineStorage
 
 DEFAULT_FILE_PATTERN = re.compile(
     r".*[\\/](?P<source>[^\\/]+)[\\/](?P<year>\d{4})-(?P<month>\d{2})-(?P<day>\d{2})_(?P<author>[^_]+)_\d+\.txt"
@@ -23,8 +23,8 @@ log = logging.getLogger(__name__)
 
 
 async def load(
-    config: PipelineInputConfig,
-    progress: ProgressReporter | None,
+    config: InputConfig,
+    progress: ProgressLogger | None,
     storage: PipelineStorage,
 ) -> pd.DataFrame:
     """Load text inputs from a directory."""
@@ -36,7 +36,7 @@ async def load(
             group = {}
         text = await storage.get(path, encoding="utf-8")
         new_item = {**group, "text": text}
-        new_item["id"] = gen_md5_hash(new_item, new_item.keys())
+        new_item["id"] = gen_sha512_hash(new_item, new_item.keys())
         new_item["title"] = str(Path(path).name)
         return new_item
 
@@ -52,4 +52,15 @@ async def load(
         raise ValueError(msg)
     found_files = f"found text files from {config.base_dir}, found {files}"
     log.info(found_files)
-    return pd.DataFrame([await load_file(file, group) for file, group in files])
+
+    files_loaded = []
+
+    for file, group in files:
+        try:
+            files_loaded.append(await load_file(file, group))
+        except Exception:  # noqa: BLE001 (catching Exception is fine here)
+            log.warning("Warning! Error loading file %s. Skipping...", file)
+
+    log.info("Found %d files, loading %d", len(files), len(files_loaded))
+
+    return pd.DataFrame(files_loaded)

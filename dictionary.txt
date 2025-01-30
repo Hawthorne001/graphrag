@@ -1,5 +1,8 @@
 # Team
 Alonso
+Truitt
+Trinh
+Fernández
 
 # Pythonisms
 PYTHONPATH
@@ -20,17 +23,27 @@ isna
 getcwd
 fillna
 noqa
+dtypes
+ints
+genid
 
 # Azure
 abfs
+cosmosdb
 Hnsw
 odata
 
-# NLTK Terms
+# NLP Terms
 chunker
 wordnet
 maxent
 punkt
+punct
+lemmatizer
+PROPN
+Syntatic
+ents
+INTJ
 
 # Libraries
 Langchain
@@ -62,6 +75,9 @@ numpy
 pypi
 nbformat
 semversioner
+mkdocs
+fnllm
+typer
 
 # Library Methods
 iterrows
@@ -84,11 +100,20 @@ isin
 nocache
 nbconvert
 
+# HTML
+nbsp
+onclick
+pymdownx
+linenums
+twemoji
+Gephi
+gephi
+Gephi's
+
 # Verbs
 binarize
 prechunked
 openai
-genid
 umap
 concat
 unhot
@@ -97,6 +122,9 @@ retryer
 agenerate
 aembed
 dedupe
+dropna
+dtypes
+notna
 
 # LLM Terms
 AOAI
@@ -127,16 +155,31 @@ codebases
 # Microsoft
 MSRC
 
-# Broken Upstream
-# TODO FIX IN DATASHAPER
-Arrary
-
 # Prompt Inputs
-dulce
-Asadi
 ABILA
 Abila
+ALHAMIA
+Alhamia
+Asadi
+Aurelians
+Bataglani
+BATAGLANI
+Bratinas
+dulce
+Durke
+Firuzabad
+Firuzabad's
+FIRUZABAD
+Krohaara
+KROHAARA
 POKRALLY
+René
+Tazbah
+TIRUZIA
+Tiruzia
+Tiruzia's
+Verdantis
+Verdantis's
 
 # English
 skippable
@@ -144,3 +187,10 @@ upvote
 
 # Misc
 Arxiv
+kwds
+
+# Dulce
+astrotechnician
+epitheg
+unspooled
+unnavigated

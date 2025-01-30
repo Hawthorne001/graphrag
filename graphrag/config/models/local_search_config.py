@@ -11,6 +11,9 @@ import graphrag.config.defaults as defs
 class LocalSearchConfig(BaseModel):
     """The default configuration section for Cache."""
 
+    prompt: str | None = Field(
+        description="The local search prompt to use.", default=None
+    )
     text_unit_prop: float = Field(
         description="The text unit proportion.",
         default=defs.LOCAL_SEARCH_TEXT_UNIT_PROP,
@@ -30,6 +33,18 @@ class LocalSearchConfig(BaseModel):
     top_k_relationships: int = Field(
         description="The top k mapped relations.",
         default=defs.LOCAL_SEARCH_TOP_K_RELATIONSHIPS,
+    )
+    temperature: float = Field(
+        description="The temperature to use for token generation.",
+        default=defs.LOCAL_SEARCH_LLM_TEMPERATURE,
+    )
+    top_p: float = Field(
+        description="The top-p value to use for token generation.",
+        default=defs.LOCAL_SEARCH_LLM_TOP_P,
+    )
+    n: int = Field(
+        description="The number of completions to generate.",
+        default=defs.LOCAL_SEARCH_LLM_N,
     )
     max_tokens: int = Field(
         description="The maximum tokens.", default=defs.LOCAL_SEARCH_MAX_TOKENS
